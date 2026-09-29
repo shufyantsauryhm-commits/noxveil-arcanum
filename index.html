@@ -1,732 +1,1295 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#05070b" />
-  <title>NOXVEIL ARCANUM</title>
-
-  <style>
-    :root {
-      --bg: #05070b;
-      --bg-2: #090d14;
-      --panel: rgba(14, 18, 28, 0.68);
-      --panel-hover: rgba(18, 24, 38, 0.9);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(98, 130, 255, 0.35);
-      --text: #f5f7fc;
-      --muted: #98a2b3;
-      --muted-2: #697386;
-      --line: rgba(255,255,255,0.04);
-      --blue: #4f6bff;
-      --blue-soft: rgba(79, 107, 255, 0.16);
-      --purple-soft: rgba(103, 78, 255, 0.12);
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at 15% 20%, rgba(74, 99, 255, 0.16), transparent 24%),
-        radial-gradient(circle at 85% 15%, rgba(118, 70, 255, 0.10), transparent 22%),
-        linear-gradient(180deg, #07090f 0%, #030406 100%);
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(var(--line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--line) 1px, transparent 1px);
-      background-size: 34px 34px;
-      opacity: 0.5;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0.08));
-    }
-
-    .ambient {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .orb {
-      position: absolute;
-      border-radius: 999px;
-      filter: blur(40px);
-      opacity: 0.7;
-      animation: float 12s ease-in-out infinite;
-    }
-
-    .orb.one {
-      width: 220px;
-      height: 220px;
-      background: rgba(74, 99, 255, 0.22);
-      top: 8%;
-      left: -4%;
-    }
-
-    .orb.two {
-      width: 260px;
-      height: 260px;
-      background: rgba(114, 80, 255, 0.18);
-      top: 55%;
-      right: -6%;
-      animation-delay: -3s;
-    }
-
-    .orb.three {
-      width: 160px;
-      height: 160px;
-      background: rgba(56, 142, 255, 0.14);
-      bottom: 6%;
-      left: 10%;
-      animation-delay: -6s;
-    }
-
-    .cursor-glow {
-      position: fixed;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(76, 103, 255, 0.16), rgba(76, 103, 255, 0.00) 65%);
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      z-index: 0;
-      transition: transform 0.08s linear;
-      mix-blend-mode: screen;
-    }
-
-    .wrap {
-      width: 100%;
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 34px 22px 60px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 18px;
-      margin-bottom: 40px;
-      color: var(--muted-2);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-
-    .mini-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .mini-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #6d88ff;
-      box-shadow: 0 0 14px rgba(109, 136, 255, 0.8);
-      animation: pulse 2s infinite;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 24px;
-      align-items: stretch;
-      margin-bottom: 26px;
-    }
-
-    .hero-left,
-    .hero-right {
-      border: 1px solid var(--border);
-      background: rgba(10, 13, 20, 0.6);
-      backdrop-filter: blur(16px);
-      border-radius: 26px;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-left {
-      padding: 34px 30px 30px;
-    }
-
-    .hero-left::before,
-    .hero-right::before,
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.04), transparent);
-      transform: translateX(-120%);
-      transition: transform 0.8s ease;
-      pointer-events: none;
-    }
-
-    .hero-left:hover::before,
-    .hero-right:hover::before,
-    .card:hover::before {
-      transform: translateX(120%);
-    }
-
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #a8b1c5;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 18px;
-    }
-
-    .tag::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #6880ff;
-      box-shadow: 0 0 12px rgba(104,128,255,0.7);
-    }
-
-    h1 {
-      font-size: clamp(42px, 7vw, 74px);
-      line-height: 0.93;
-      letter-spacing: -0.055em;
-      font-weight: 680;
-      max-width: 680px;
-    }
-
-    .accent {
-      color: #9aa9de;
-      font-weight: 480;
-    }
-
-    .hero-copy {
-      margin-top: 20px;
-      max-width: 620px;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.75;
-    }
-
-    .hero-points {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 24px;
-    }
-
-    .pill {
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.035);
-      color: #b8c2d8;
-      font-size: 12px;
-    }
-
-    .hero-right {
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 100%;
-    }
-
-    .stat-label {
-      color: #7f8aa0;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .signal-box {
-      border: 1px solid rgba(255,255,255,0.06);
-      background:
-        radial-gradient(circle at top right, rgba(73, 105, 255, 0.15), transparent 34%),
-        rgba(255,255,255,0.03);
-      border-radius: 22px;
-      padding: 22px;
-      margin-bottom: 18px;
-    }
-
-    .signal-title {
-      font-size: 24px;
-      font-weight: 650;
-      letter-spacing: -0.03em;
-      margin-bottom: 8px;
-    }
-
-    .signal-text {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    .status-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .mini-card {
-      border-radius: 18px;
-      background: rgba(255,255,255,0.035);
-      border: 1px solid rgba(255,255,255,0.06);
-      padding: 16px;
-    }
-
-    .mini-card h3 {
-      font-size: 22px;
-      margin-bottom: 6px;
-      font-weight: 640;
-    }
-
-    .mini-card p {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 18px;
-      margin: 26px 0 18px;
-    }
-
-    .section-head h2 {
-      font-size: 20px;
-      letter-spacing: -0.03em;
-      font-weight: 620;
-    }
-
-    .section-head p {
-      color: var(--muted-2);
-      font-size: 13px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      position: relative;
-      overflow: hidden;
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      padding: 22px;
-      border-radius: 24px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      box-shadow: var(--shadow);
-      transform-style: preserve-3d;
-      transition:
-        transform 180ms ease,
-        border-color 180ms ease,
-        background 180ms ease,
-        box-shadow 180ms ease;
-      min-height: 188px;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: var(--border-strong);
-      background: var(--panel-hover);
-      box-shadow: 0 24px 70px rgba(0,0,0,0.42);
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: 18px;
-    }
-
-    .index {
-      color: #60697c;
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .chip {
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(79, 107, 255, 0.08);
-      color: #b7c3ff;
-      border: 1px solid rgba(79, 107, 255, 0.15);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
-
-    .card h3 {
-      font-size: 24px;
-      letter-spacing: -0.03em;
-      margin-bottom: 10px;
-      font-weight: 640;
-    }
-
-    .card p {
-      color: var(--muted);
-      line-height: 1.72;
-      font-size: 14px;
-      max-width: 95%;
-    }
-
-    .card-bottom {
-      margin-top: 26px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .meta {
-      color: #8893a8;
-      font-size: 12px;
-      letter-spacing: 0.03em;
-    }
-
-    .arrow {
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #d9e0f4;
-      background: rgba(255,255,255,0.03);
-      font-size: 18px;
-      transition: transform 180ms ease, background 180ms ease;
-      flex-shrink: 0;
-    }
-
-    .card:hover .arrow {
-      transform: translateX(3px) rotate(-6deg);
-      background: rgba(79, 107, 255, 0.10);
-    }
-
-    .footer {
-      margin-top: 26px;
-      border: 1px solid var(--border);
-      background: rgba(10, 13, 20, 0.55);
-      border-radius: 24px;
-      padding: 20px 22px;
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      color: #7f8aa0;
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    .footer strong {
-      color: #b9c2d6;
-      font-weight: 550;
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0px) translateX(0px);
-      }
-      50% {
-        transform: translateY(-18px) translateX(12px);
-      }
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 0.8;
-      }
-      50% {
-        transform: scale(1.18);
-        opacity: 1;
-      }
-    }
-
-    @media (max-width: 960px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .cards {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .wrap {
-        padding: 24px 16px 46px;
-      }
-
-      .topbar {
-        margin-bottom: 28px;
-        font-size: 10px;
-      }
-
-      .hero-left,
-      .hero-right,
-      .card,
-      .footer {
-        border-radius: 20px;
-      }
-
-      .hero-left {
-        padding: 26px 20px 22px;
-      }
-
-      .hero-right {
-        padding: 18px;
-      }
-
-      h1 {
-        font-size: 40px;
-      }
-
-      .hero-copy,
-      .card p {
-        font-size: 13px;
-      }
-
-      .signal-title {
-        font-size: 20px;
-      }
-
-      .footer {
-        flex-direction: column;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#05070a">
+
+<title>NOXVEIL ARCANUM — Official Access</title>
+
+<meta
+  name="description"
+  content="Official access NOXVEIL ARCANUM — trading education, community, market content, free daily signal, and broker registration."
+>
+
+<style>
+:root{
+  --bg:#05070a;
+  --bg2:#080b11;
+  --surface:rgba(13,17,24,.72);
+  --surface2:rgba(18,23,34,.88);
+  --line:rgba(255,255,255,.08);
+  --line2:rgba(115,139,255,.28);
+  --text:#f5f7fb;
+  --muted:#919bad;
+  --muted2:#606a7a;
+  --blue:#5d78ff;
+  --blue2:#879aff;
+  --shadow:0 30px 80px rgba(0,0,0,.42);
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  background:
+    radial-gradient(circle at 12% 5%,rgba(59,84,180,.18),transparent 28%),
+    radial-gradient(circle at 90% 35%,rgba(89,53,187,.10),transparent 22%),
+    linear-gradient(180deg,#07090e 0%,#030406 100%);
+  color:var(--text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.grid{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.32;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(to bottom,black,transparent 78%);
+}
+
+.noise{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:50;
+  opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
+}
+
+.mouse-light{
+  width:500px;
+  height:500px;
+  border-radius:50%;
+  position:fixed;
+  pointer-events:none;
+  z-index:0;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(
+    circle,
+    rgba(80,105,255,.11),
+    rgba(80,105,255,.025) 36%,
+    transparent 68%
+  );
+}
+
+/* =========================
+   GLOBAL
+========================= */
+
+.shell{
+  position:relative;
+  z-index:2;
+  width:min(1180px,calc(100% - 34px));
+  margin:auto;
+}
+
+a{
+  color:inherit;
+}
+
+.eyebrow{
+  color:#8997bf;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+}
+
+.section-title{
+  font-size:clamp(30px,4vw,46px);
+  letter-spacing:-.045em;
+  font-weight:620;
+}
+
+.section-copy{
+  color:var(--muted);
+  max-width:600px;
+  line-height:1.75;
+  font-size:14px;
+}
+
+/* =========================
+   NAV
+========================= */
+
+nav{
+  height:88px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.055);
+}
+
+.logo{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  font-size:13px;
+  font-weight:650;
+  letter-spacing:.1em;
+}
+
+.logo-mark{
+  width:30px;
+  height:30px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  background:
+    linear-gradient(145deg,rgba(110,137,255,.28),rgba(30,38,65,.2));
+  border:1px solid rgba(133,155,255,.32);
+  box-shadow:
+    inset 0 0 16px rgba(93,120,255,.08),
+    0 0 30px rgba(93,120,255,.09);
+  font-size:10px;
+}
+
+.nav-right{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  color:var(--muted2);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.13em;
+}
+
+.live-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#7790ff;
+  box-shadow:0 0 14px #637fff;
+  animation:pulse 2.3s infinite;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  min-height:680px;
+  display:grid;
+  grid-template-columns:1.03fr .97fr;
+  gap:26px;
+  align-items:center;
+  padding:76px 0 84px;
+}
+
+.hero-content{
+  padding-right:24px;
+}
+
+.hero h1{
+  font-size:clamp(52px,7vw,88px);
+  line-height:.88;
+  letter-spacing:-.065em;
+  font-weight:650;
+  margin:18px 0 26px;
+}
+
+.hero h1 span{
+  color:#8e9ed2;
+  font-weight:430;
+}
+
+.hero-copy{
+  color:var(--muted);
+  line-height:1.8;
+  font-size:15px;
+  max-width:570px;
+}
+
+.hero-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:11px;
+  margin-top:32px;
+}
+
+.btn{
+  min-height:49px;
+  padding:0 19px;
+  border-radius:14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:600;
+  transition:.22s ease;
+}
+
+.btn-primary{
+  background:#eef2ff;
+  color:#080b11;
+}
+
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 40px rgba(150,166,255,.18);
+}
+
+.btn-secondary{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.035);
+  color:#c9d0df;
+}
+
+.btn-secondary:hover{
+  border-color:var(--line2);
+  background:rgba(255,255,255,.055);
+}
+
+.hero-meta{
+  display:flex;
+  gap:24px;
+  margin-top:36px;
+  color:#6d7788;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+}
+
+.hero-visual{
+  position:relative;
+  height:535px;
+  border-radius:30px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.09);
+  box-shadow:var(--shadow);
+  background:#0b0e14;
+  transform-style:preserve-3d;
+}
+
+.hero-visual img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:saturate(.55) brightness(.57) contrast(1.08);
+  transform:scale(1.04);
+}
+
+.hero-visual::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  background:
+    linear-gradient(180deg,rgba(5,7,10,.07),rgba(5,7,10,.2) 45%,rgba(5,7,10,.93)),
+    linear-gradient(90deg,rgba(57,77,162,.18),transparent 50%);
+}
+
+.hero-overlay{
+  position:absolute;
+  inset:auto 24px 24px;
+  z-index:3;
+  padding:20px;
+  border-radius:20px;
+  background:rgba(7,10,16,.72);
+  border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(16px);
+}
+
+.hero-overlay-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.hero-overlay h3{
+  font-size:19px;
+  letter-spacing:-.025em;
+}
+
+.hero-overlay p{
+  color:#929cad;
+  font-size:12px;
+  line-height:1.65;
+  margin-top:8px;
+}
+
+.market-tag{
+  font-size:10px;
+  padding:7px 9px;
+  border-radius:999px;
+  color:#aebcff;
+  border:1px solid rgba(102,129,255,.22);
+  background:rgba(78,101,255,.08);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+}
+
+/* =========================
+   MAIN TELEGRAM
+========================= */
+
+.access-section{
+  padding:50px 0 96px;
+}
+
+.access-card{
+  position:relative;
+  overflow:hidden;
+  min-height:390px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:30px;
+  box-shadow:var(--shadow);
+  background:#080b10;
+}
+
+.access-card img{
+  position:absolute;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:saturate(.58) brightness(.44);
+}
+
+.access-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(4,6,10,.94) 0%,rgba(4,6,10,.77) 45%,rgba(4,6,10,.22)),
+    linear-gradient(0deg,rgba(25,38,91,.19),transparent);
+}
+
+.access-content{
+  position:relative;
+  z-index:2;
+  width:min(610px,100%);
+  padding:55px;
+}
+
+.access-content h2{
+  font-size:clamp(36px,5vw,60px);
+  letter-spacing:-.055em;
+  line-height:.98;
+  margin:14px 0 18px;
+}
+
+.access-content p{
+  color:#a5adbb;
+  line-height:1.75;
+  font-size:14px;
+}
+
+.features{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:24px 0 28px;
+}
+
+.feature{
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.045);
+  padding:9px 12px;
+  border-radius:999px;
+  color:#bfc7d8;
+  font-size:11px;
+}
+
+/* =========================
+   SOCIAL SECTION
+========================= */
+
+.social-section{
+  padding-bottom:100px;
+}
+
+.section-heading{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:30px;
+  margin-bottom:30px;
+}
+
+.section-heading-left{
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+}
+
+.social-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
+.visual-card{
+  position:relative;
+  overflow:hidden;
+  min-height:390px;
+  border-radius:26px;
+  border:1px solid rgba(255,255,255,.08);
+  text-decoration:none;
+  box-shadow:var(--shadow);
+  background:#0b0e14;
+  transform-style:preserve-3d;
+  transition:
+    transform .2s ease,
+    border-color .2s ease;
+}
+
+.visual-card:hover{
+  border-color:rgba(112,136,255,.3);
+}
+
+.visual-card img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:saturate(.63) brightness(.51);
+  transition:transform .7s ease,filter .5s ease;
+}
+
+.visual-card:hover img{
+  transform:scale(1.045);
+  filter:saturate(.72) brightness(.56);
+}
+
+.visual-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg,rgba(4,6,10,.08) 10%,rgba(4,6,10,.28) 48%,rgba(4,6,10,.95));
+}
+
+.visual-card-content{
+  position:absolute;
+  left:24px;
+  right:24px;
+  bottom:24px;
+  z-index:2;
+}
+
+.card-number{
+  font-size:10px;
+  color:#9da9cb;
+  text-transform:uppercase;
+  letter-spacing:.15em;
+  margin-bottom:10px;
+}
+
+.visual-card h3{
+  font-size:29px;
+  letter-spacing:-.035em;
+  margin-bottom:8px;
+}
+
+.visual-card p{
+  color:#9da6b6;
+  line-height:1.65;
+  font-size:13px;
+  max-width:420px;
+}
+
+.card-link{
+  margin-top:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-top:1px solid rgba(255,255,255,.08);
+  padding-top:16px;
+  color:#c7cfdf;
+  font-size:12px;
+}
+
+.circle-arrow{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.11);
+  background:rgba(255,255,255,.035);
+}
+
+/* =========================
+   BROKER
+========================= */
+
+.broker-section{
+  padding:86px 0 96px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+
+.broker-intro{
+  display:grid;
+  grid-template-columns:.85fr 1.15fr;
+  gap:70px;
+  margin-bottom:38px;
+  align-items:end;
+}
+
+.broker-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
+.broker-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:28px;
+  min-height:450px;
+  border:1px solid rgba(255,255,255,.08);
+  background:#0b0e14;
+  text-decoration:none;
+  color:inherit;
+  box-shadow:var(--shadow);
+  transform-style:preserve-3d;
+}
+
+.broker-card img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:brightness(.38) saturate(.58);
+  transition:.6s ease;
+}
+
+.broker-card:hover img{
+  transform:scale(1.04);
+  filter:brightness(.45) saturate(.7);
+}
+
+.broker-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg,rgba(4,6,10,.1),rgba(4,6,10,.92) 74%),
+    linear-gradient(110deg,rgba(44,67,160,.21),transparent 45%);
+}
+
+.broker-content{
+  position:absolute;
+  left:25px;
+  right:25px;
+  bottom:25px;
+  z-index:2;
+}
+
+.broker-badge{
+  display:inline-flex;
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(5,7,10,.52);
+  backdrop-filter:blur(12px);
+  border-radius:999px;
+  font-size:9px;
+  color:#9eabc5;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  margin-bottom:12px;
+}
+
+.broker-content h3{
+  font-size:34px;
+  letter-spacing:-.045em;
+}
+
+.broker-content p{
+  color:#9ca5b5;
+  font-size:13px;
+  margin-top:10px;
+  line-height:1.7;
+}
+
+.broker-bottom{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  border-top:1px solid rgba(255,255,255,.08);
+  margin-top:20px;
+  padding-top:17px;
+  color:#cbd2e1;
+  font-size:12px;
+}
+
+/* =========================
+   DISCLAIMER
+========================= */
+
+.disclosure{
+  margin-top:20px;
+  padding:18px 20px;
+  border-radius:17px;
+  border:1px solid rgba(255,255,255,.055);
+  background:rgba(255,255,255,.02);
+  color:#626c7e;
+  font-size:10px;
+  line-height:1.75;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  padding:36px 0 48px;
+  border-top:1px solid rgba(255,255,255,.06);
+  display:flex;
+  justify-content:space-between;
+  gap:30px;
+  color:#5f6878;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+}
+
+.footer-name{
+  color:#8c97ad;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+.reveal{
+  opacity:0;
+  transform:translateY(22px);
+  transition:
+    opacity .75s ease,
+    transform .75s cubic-bezier(.2,.7,.2,1);
+}
+
+.reveal.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+@keyframes pulse{
+  0%,100%{opacity:.55;transform:scale(.9)}
+  50%{opacity:1;transform:scale(1.18)}
+}
+
+@media(max-width:850px){
+
+  .hero{
+    grid-template-columns:1fr;
+    padding:48px 0 64px;
+  }
+
+  .hero-content{
+    padding-right:0;
+  }
+
+  .hero-visual{
+    height:470px;
+  }
+
+  .social-grid,
+  .broker-grid{
+    grid-template-columns:1fr;
+  }
+
+  .broker-intro{
+    grid-template-columns:1fr;
+    gap:18px;
+  }
+
+  .section-heading{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+
+@media(max-width:600px){
+
+  .shell{
+    width:min(100% - 26px,1180px);
+  }
+
+  nav{
+    height:72px;
+  }
+
+  .nav-right span:last-child{
+    display:none;
+  }
+
+  .hero{
+    min-height:auto;
+  }
+
+  .hero h1{
+    font-size:52px;
+  }
+
+  .hero-visual{
+    height:420px;
+    border-radius:22px;
+  }
+
+  .hero-overlay{
+    inset:auto 15px 15px;
+  }
+
+  .hero-meta{
+    gap:14px;
+    flex-wrap:wrap;
+  }
+
+  .access-card{
+    border-radius:22px;
+  }
+
+  .access-content{
+    padding:34px 24px;
+  }
+
+  .visual-card,
+  .broker-card{
+    border-radius:22px;
+  }
+
+  footer{
+    flex-direction:column;
+  }
+
+  .mouse-light{
+    display:none;
+  }
+}
+</style>
 </head>
+
 <body>
 
-  <div class="ambient">
-    <div class="orb one"></div>
-    <div class="orb two"></div>
-    <div class="orb three"></div>
+<div class="grid"></div>
+<div class="noise"></div>
+<div class="mouse-light" id="mouseLight"></div>
+
+<div class="shell">
+
+<nav>
+  <div class="logo">
+    <div class="logo-mark">N</div>
+    <span>NOXVEIL ARCANUM</span>
   </div>
 
-  <div class="cursor-glow" id="cursorGlow"></div>
+  <div class="nav-right">
+    <div class="live-dot"></div>
+    <span>Official Access</span>
+    <span>Est. 2026</span>
+  </div>
+</nav>
 
-  <main class="wrap">
-    <div class="topbar">
-      <div class="mini-brand">
-        <span class="mini-dot"></span>
-        <span>NOXVEIL ARCANUM</span>
-      </div>
-      <div>Trading • Education • Community</div>
-    </div>
+<!-- HERO -->
 
-    <section class="hero">
-      <div class="hero-left">
-        <div class="tag">official access point</div>
+<section class="hero">
 
-        <h1>
-          NOXVEIL
-          <span class="accent">ARCANUM</span>
-        </h1>
+  <div class="hero-content reveal">
 
-        <p class="hero-copy">
-          Satu pintu untuk akses komunitas, ruang belajar, update market,
-          free daily signal, dan pendaftaran akun trading partner.
-        </p>
+    <div class="eyebrow">Trading • Education • Community</div>
 
-        <div class="hero-points">
-          <div class="pill">Akses Belajar</div>
-          <div class="pill">Free Daily Signal</div>
-          <div class="pill">Broker Registration</div>
-          <div class="pill">Official Social Links</div>
-        </div>
-      </div>
+    <h1>
+      Find your
+      <span>edge.</span>
+    </h1>
 
-      <div class="hero-right">
-        <div class="signal-box">
-          <div class="stat-label">highlight</div>
-          <div class="signal-title">Akses Belajar & Signal Harian</div>
-          <div class="signal-text">
-            Masuk ke Telegram NOXVEIL untuk belajar, diskusi market,
-            update rutin, dan free daily signal.
-          </div>
-        </div>
+    <p class="hero-copy">
+      Akses resmi NOXVEIL ARCANUM untuk belajar market,
+      bergabung ke komunitas, mengikuti konten,
+      menerima free daily signal, dan mengakses
+      link pendaftaran akun trading.
+    </p>
 
-        <div class="status-grid">
-          <div class="mini-card">
-            <h3>24/7</h3>
-            <p>akses link resmi NOXVEIL kapan aja</p>
-          </div>
-          <div class="mini-card">
-            <h3>2</h3>
-            <p>broker partner untuk pendaftaran akun trading</p>
-          </div>
-        </div>
-      </div>
-    </section>
+    <div class="hero-actions">
 
-    <div class="section-head">
-      <div>
-        <h2>Official Doors</h2>
-        <p>Pilih jalur yang mau lu masukin.</p>
-      </div>
-    </div>
-
-    <section class="cards">
-
-      <a class="card tilt" href="https://t.me/noxveilarcanum73" target="_blank" rel="noopener noreferrer">
-        <div class="card-top">
-          <div class="index">01 / community</div>
-          <div class="chip">telegram</div>
-        </div>
-        <h3>Telegram Access</h3>
-        <p>
-          Akses belajar, diskusi market, update rutin, dan free daily signal
-          langsung dari channel/komunitas resmi NOXVEIL.
-        </p>
-        <div class="card-bottom">
-          <div class="meta">Join learning access</div>
-          <div class="arrow">↗</div>
-        </div>
+      <a
+        href="https://t.me/noxveilarcanum73"
+        target="_blank"
+        class="btn btn-primary"
+      >
+        Enter Telegram ↗
       </a>
 
-      <a class="card tilt" href="https://www.tiktok.com/@noxveilarcanum" target="_blank" rel="noopener noreferrer">
-        <div class="card-top">
-          <div class="index">02 / social</div>
-          <div class="chip">tiktok</div>
+      <a
+        href="#brokers"
+        class="btn btn-secondary"
+      >
+        Broker Registration
+      </a>
+
+    </div>
+
+    <div class="hero-meta">
+      <span>Market Education</span>
+      <span>Daily Signal</span>
+      <span>Community</span>
+    </div>
+
+  </div>
+
+  <div class="hero-visual tilt reveal">
+
+    <img
+      src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1500&q=88"
+      alt="Market trading environment"
+    >
+
+    <div class="hero-overlay">
+
+      <div class="hero-overlay-top">
+
+        <div>
+          <div class="eyebrow">NOXVEIL ACCESS / 073</div>
+          <h3>Market never stops.</h3>
         </div>
+
+        <div class="market-tag">Active</div>
+
+      </div>
+
+      <p>
+        Build perspective. Control risk. Execute with reason.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- TELEGRAM -->
+
+<section class="access-section">
+
+  <div class="access-card reveal">
+
+    <img
+      src="https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1700&q=88"
+      alt="NOXVEIL learning access"
+    >
+
+    <div class="access-content">
+
+      <div class="eyebrow">
+        Main Community Access
+      </div>
+
+      <h2>
+        Belajar market.<br>
+        Stay connected.
+      </h2>
+
+      <p>
+        Masuk ke Telegram NOXVEIL untuk akses belajar,
+        diskusi market, update rutin, dan free daily signal
+        dari komunitas NOXVEIL ARCANUM.
+      </p>
+
+      <div class="features">
+        <span class="feature">Trading Education</span>
+        <span class="feature">Market Discussion</span>
+        <span class="feature">Free Daily Signal</span>
+        <span class="feature">Community Access</span>
+      </div>
+
+      <a
+        href="https://t.me/noxveilarcanum73"
+        target="_blank"
+        class="btn btn-primary"
+      >
+        Join Telegram ↗
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- SOCIAL -->
+
+<section class="social-section">
+
+  <div class="section-heading reveal">
+
+    <div class="section-heading-left">
+      <div class="eyebrow">Social & Content</div>
+
+      <h2 class="section-title">
+        Follow the movement.
+      </h2>
+    </div>
+
+    <p class="section-copy">
+      Konten NOXVEIL di luar komunitas utama.
+      Ikuti insight, aktivitas, edukasi singkat, dan perkembangan terbaru.
+    </p>
+
+  </div>
+
+  <div class="social-grid">
+
+    <!-- TIKTOK -->
+
+    <a
+      class="visual-card tilt reveal"
+      href="https://www.tiktok.com/@noxveilarcanum"
+      target="_blank"
+      rel="noopener"
+    >
+
+      <img
+        src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1300&q=86"
+        alt="TikTok NOXVEIL"
+      >
+
+      <div class="visual-card-content">
+
+        <div class="card-number">
+          01 — Short Form Content
+        </div>
+
         <h3>TikTok</h3>
-        <p>
-          Konten singkat, insight market, potongan edukasi,
-          dan update cepat dari NOXVEIL ARCANUM.
-        </p>
-        <div class="card-bottom">
-          <div class="meta">@noxveilarcanum</div>
-          <div class="arrow">↗</div>
-        </div>
-      </a>
 
-      <a class="card tilt" href="https://www.instagram.com/noxveil_arcanum73" target="_blank" rel="noopener noreferrer">
-        <div class="card-top">
-          <div class="index">03 / social</div>
-          <div class="chip">instagram</div>
+        <p>
+          Market insight, edukasi singkat,
+          potongan live, dan perspektif trading
+          dalam format yang cepat.
+        </p>
+
+        <div class="card-link">
+          <span>@noxveilarcanum</span>
+          <div class="circle-arrow">↗</div>
         </div>
+
+      </div>
+
+    </a>
+
+    <!-- INSTAGRAM -->
+
+    <a
+      class="visual-card tilt reveal"
+      href="https://www.instagram.com/noxveil_arcanum73"
+      target="_blank"
+      rel="noopener"
+    >
+
+      <img
+        src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1300&q=86"
+        alt="Instagram NOXVEIL"
+      >
+
+      <div class="visual-card-content">
+
+        <div class="card-number">
+          02 — Brand & Updates
+        </div>
+
         <h3>Instagram</h3>
+
         <p>
-          Update identitas brand, aktivitas, dan informasi resmi
-          NOXVEIL dalam format visual yang lebih clean.
+          Visual update, aktivitas,
+          pengumuman, dan perkembangan
+          NOXVEIL ARCANUM.
         </p>
-        <div class="card-bottom">
-          <div class="meta">@noxveil_arcanum73</div>
-          <div class="arrow">↗</div>
-        </div>
-      </a>
 
-      <a class="card tilt" href="https://hfmtrade-ind.com/sv/en/?refid=30474368" target="_blank" rel="noopener noreferrer">
-        <div class="card-top">
-          <div class="index">04 / broker</div>
-          <div class="chip">hfm</div>
+        <div class="card-link">
+          <span>@noxveil_arcanum73</span>
+          <div class="circle-arrow">↗</div>
         </div>
-        <h3>Register HFM</h3>
-        <p>
-          Link pendaftaran akun trading partner HFM.
-          Buat yang mau mulai buka akun melalui jalur resmi yang lu share.
-        </p>
-        <div class="card-bottom">
-          <div class="meta">Open trading account</div>
-          <div class="arrow">↗</div>
-        </div>
-      </a>
 
-      <a class="card tilt" href="https://client.kosbackoffice.com/register/trader?link_id=g5ho0t48&referrer_id=oxvlhnr7" target="_blank" rel="noopener noreferrer">
-        <div class="card-top">
-          <div class="index">05 / broker</div>
-          <div class="chip">kosmarket</div>
-        </div>
-        <h3>Register KOSMARKET</h3>
-        <p>
-          Alternatif broker partner untuk pendaftaran akun trading
-          melalui link referral resmi yang sudah lu sediain.
-        </p>
-        <div class="card-bottom">
-          <div class="meta">Create new account</div>
-          <div class="arrow">↗</div>
-        </div>
-      </a>
-
-    </section>
-
-    <section class="footer">
-      <div>
-        <strong>NOXVEIL ARCANUM</strong><br />
-        Trading • Education • Community
       </div>
-      <div>
-        Telegram = akses belajar + free daily signal.<br />
-        Broker links tersedia untuk pendaftaran akun trading.
+
+    </a>
+
+  </div>
+
+</section>
+
+<!-- BROKER -->
+
+<section class="broker-section" id="brokers">
+
+  <div class="broker-intro reveal">
+
+    <div>
+
+      <div class="eyebrow">
+        Trading Account
       </div>
-    </section>
-  </main>
 
-  <script>
-    const glow = document.getElementById('cursorGlow');
+      <h2 class="section-title">
+        Broker Access.
+      </h2>
 
-    window.addEventListener('mousemove', (e) => {
-      glow.style.left = e.clientX + 'px';
-      glow.style.top = e.clientY + 'px';
-    });
+    </div>
 
-    const tiltCards = document.querySelectorAll('.tilt');
+    <p class="section-copy">
+      Pilihan link pendaftaran akun trading yang tersedia melalui NOXVEIL.
+      Pelajari ketentuan, biaya, risiko, dan regulasi masing-masing broker
+      sebelum membuat akun atau melakukan deposit.
+    </p>
 
-    tiltCards.forEach((card) => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+  </div>
 
-        const rotateY = ((x / rect.width) - 0.5) * 8;
-        const rotateX = ((y / rect.height) - 0.5) * -8;
+  <div class="broker-grid">
 
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
-      });
+    <!-- HFM -->
 
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-      });
-    });
-  </script>
+    <a
+      class="broker-card tilt reveal"
+      href="https://hfmtrade-ind.com/sv/en/?refid=30474368"
+      target="_blank"
+      rel="noopener"
+    >
+
+      <img
+        src="https://images.unsplash.com/photo-1642790106117-e829e14a795f?auto=format&fit=crop&w=1300&q=88"
+        alt="HFM account registration"
+      >
+
+      <div class="broker-content">
+
+        <div class="broker-badge">
+          Broker Registration
+        </div>
+
+        <h3>HFM</h3>
+
+        <p>
+          Akses link pendaftaran akun HFM
+          melalui referral NOXVEIL.
+        </p>
+
+        <div class="broker-bottom">
+          <span>Open registration</span>
+          <div class="circle-arrow">↗</div>
+        </div>
+
+      </div>
+
+    </a>
+
+    <!-- KOSMARKET -->
+
+    <a
+      class="broker-card tilt reveal"
+      href="https://client.kosbackoffice.com/register/trader?link_id=g5ho0t48&referrer_id=oxvlhnr7"
+      target="_blank"
+      rel="noopener"
+    >
+
+      <img
+        src="https://images.unsplash.com/photo-1569025690938-a00729c9e1f9?auto=format&fit=crop&w=1300&q=88"
+        alt="KOSMARKET account registration"
+      >
+
+      <div class="broker-content">
+
+        <div class="broker-badge">
+          Broker Registration
+        </div>
+
+        <h3>KOSMARKET</h3>
+
+        <p>
+          Alternatif link pendaftaran akun trading
+          melalui referral NOXVEIL.
+        </p>
+
+        <div class="broker-bottom">
+          <span>Create trading account</span>
+          <div class="circle-arrow">↗</div>
+        </div>
+
+      </div>
+
+    </a>
+
+  </div>
+
+  <div class="disclosure reveal">
+    Trading memiliki risiko dan dapat menyebabkan kerugian modal.
+    Konten NOXVEIL bersifat edukasi dan informasi, bukan jaminan keuntungan.
+    Beberapa tautan pendaftaran di atas merupakan tautan referral dan
+    NOXVEIL dapat memperoleh benefit dari aktivitas tertentu melalui tautan tersebut.
+    Selalu periksa legalitas, syarat layanan, biaya, serta kesesuaian broker
+    dengan yurisdiksi Anda sebelum menggunakan layanan.
+  </div>
+
+</section>
+
+<footer>
+
+  <div class="footer-name">
+    NOXVEIL ARCANUM
+  </div>
+
+  <div>
+    Trading • Education • Community
+  </div>
+
+  <div>
+    © 2026
+  </div>
+
+</footer>
+
+</div>
+
+<script>
+
+/* ==========================================
+   CURSOR LIGHT
+========================================== */
+
+const light =
+  document.getElementById("mouseLight");
+
+document.addEventListener(
+  "mousemove",
+  e => {
+
+    light.style.left =
+      e.clientX + "px";
+
+    light.style.top =
+      e.clientY + "px";
+
+  }
+);
+
+
+/* ==========================================
+   3D CARD MOVEMENT
+========================================== */
+
+document
+.querySelectorAll(".tilt")
+.forEach(card => {
+
+  card.addEventListener(
+    "mousemove",
+    e => {
+
+      if(
+        window.innerWidth < 850
+      ) return;
+
+      const rect =
+        card.getBoundingClientRect();
+
+      const x =
+        e.clientX - rect.left;
+
+      const y =
+        e.clientY - rect.top;
+
+      const middleX =
+        rect.width / 2;
+
+      const middleY =
+        rect.height / 2;
+
+      const rotateY =
+        ((x - middleX) /
+        middleX) * 2.7;
+
+      const rotateX =
+        ((middleY - y) /
+        middleY) * 2.7;
+
+      card.style.transform =
+        `
+        perspective(1200px)
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg)
+        translateY(-3px)
+        `;
+
+    }
+  );
+
+  card.addEventListener(
+    "mouseleave",
+    () => {
+
+      card.style.transform =
+        "";
+
+    }
+  );
+
+});
+
+
+/* ==========================================
+   SCROLL REVEAL
+========================================== */
+
+const observer =
+  new IntersectionObserver(
+    entries => {
+
+      entries.forEach(
+        entry => {
+
+          if(
+            entry.isIntersecting
+          ){
+
+            entry.target
+            .classList
+            .add("show");
+
+          }
+
+        }
+      );
+
+    },
+    {
+      threshold:.12
+    }
+  );
+
+document
+.querySelectorAll(".reveal")
+.forEach(el => {
+
+  observer.observe(el);
+
+});
+
+</script>
+
 </body>
 </html>
