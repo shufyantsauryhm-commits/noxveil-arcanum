@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#05070b" />
+
+  <title>NOXVEIL ARCANUM</title>
+
+  <style>
+    :root {
+      --bg: #05070b;
+      --panel: rgba(13, 17, 25, 0.72);
+      --panel-hover: rgba(18, 24, 35, 0.92);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(123, 146, 255, 0.38);
+      --text: #f5f7fb;
+      --muted: #7f899b;
+      --muted-2: #525a68;
+      --blue: #4969ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(52, 78, 180, 0.12), transparent 28%),
+        linear-gradient(180deg, #07090e 0%, #030406 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.17;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(to bottom, black, transparent 70%);
+    }
+
+    .page {
+      width: 100%;
+      max-width: 560px;
+      min-height: 100vh;
+      padding: 52px 22px 34px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 52px;
+      color: var(--muted-2);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6f8cff;
+      box-shadow: 0 0 12px rgba(111, 140, 255, 0.7);
+    }
+
+    .brand {
+      margin-bottom: 40px;
+    }
+
+    .eyebrow {
+      color: #7180a0;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: clamp(38px, 8vw, 58px);
+      line-height: 0.97;
+      font-weight: 620;
+      letter-spacing: -0.045em;
+      max-width: 460px;
+    }
+
+    .accent {
+      color: #9aa8d6;
+      font-weight: 420;
+    }
+
+    .description {
+      margin-top: 22px;
+      max-width: 420px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .small-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      color: #596274;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .small-line {
+      width: 24px;
+      height: 1px;
+      background: rgba(255,255,255,0.16);
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 44px;
+    }
+
+    .link {
+      position: relative;
+      min-height: 82px;
+      padding: 0 22px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow: hidden;
+      transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        background 180ms ease;
+    }
+
+    .link::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      right: -100px;
+      top: -90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(75, 101, 255, 0.12), transparent 65%);
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+
+    .link:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-hover);
+      background: var(--panel-hover);
+    }
+
+    .link:hover::after {
+      opacity: 1;
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .index {
+      width: 28px;
+      color: #586176;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+    }
+
+    .link-text {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .name {
+      font-size: 15px;
+      font-weight: 560;
+      letter-spacing: -0.01em;
+    }
+
+    .handle {
+      color: #697386;
+      font-size: 12px;
+    }
+
+    .arrow {
+      color: #77829a;
+      font-size: 21px;
+      transition: transform 180ms ease, color 180ms ease;
+    }
+
+    .link:hover .arrow {
+      transform: translateX(3px);
+      color: #b3bdf2;
+    }
+
+    .private {
+      margin-top: 36px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 25px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      color: #565f6f;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .private strong {
+      color: #7d8799;
+      font-weight: 500;
+    }
+
+    .footer {
+      margin-top: 65px;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      color: #3f4652;
+      font-size: 10px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .signature {
+      color: #66708a;
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        padding-top: 34px;
+      }
+
+      .topline {
+        margin-bottom: 42px;
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+
+      .description {
+        font-size: 13px;
+      }
+
+      .link {
+        min-height: 76px;
+        border-radius: 16px;
+      }
+
+      .private {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="page">
+
+    <div class="topline">
+      <div>NOXVEIL / 073</div>
+
+      <div class="status">
+        <span class="dot"></span>
+        <span>Active</span>
+      </div>
+    </div>
+
+    <section class="brand">
+      <div class="eyebrow">NOXVEIL ARCANUM</div>
+
+      <h1>
+        Enter the
+        <span class="accent">other side.</span>
+      </h1>
+
+      <p class="description">
+        Trading, education, market perspective, dan ruang komunitas.
+        Semua akses resmi NOXVEIL ada di satu tempat.
+      </p>
+
+      <div class="small-note">
+        <span class="small-line"></span>
+        choose your entry
+      </div>
+    </section>
+
+    <section class="links">
+
+      <a
+        class="link"
+        href="https://www.instagram.com/noxveil_arcanum73"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div class="left">
+          <div class="index">01</div>
+
+          <div class="link-text">
+            <div class="name">Instagram</div>
+            <div class="handle">@noxveil_arcanum73</div>
+          </div>
+        </div>
+
+        <div class="arrow">↗</div>
+      </a>
+
+      <a
+        class="link"
+        href="https://www.tiktok.com/@noxveilarcanum"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div class="left">
+          <div class="index">02</div>
+
+          <div class="link-text">
+            <div class="name">TikTok</div>
+            <div class="handle">@noxveilarcanum</div>
+          </div>
+        </div>
+
+        <div class="arrow">↗</div>
+      </a>
+
+      <a
+        class="link"
+        href="https://t.me/noxveilarcanum73"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div class="left">
+          <div class="index">03</div>
+
+          <div class="link-text">
+            <div class="name">Telegram</div>
+            <div class="handle">Private community access</div>
+          </div>
+        </div>
+
+        <div class="arrow">↗</div>
+      </a>
+
+    </section>
+
+    <section class="private">
+      <div>
+        <strong>NOXVEIL ARCANUM</strong><br>
+        Independent trading education.
+      </div>
+
+      <div>
+        One identity.<br>
+        Multiple doors.
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>© 2026</span>
+      <span class="signature">NOXVEIL</span>
+    </footer>
+
+  </main>
+
+</body>
+</html>
